@@ -1,0 +1,17 @@
+/* Pantalla "Modo Aprendizaje".
+   Antes eran páginas separadas; ahora comparten el mismo documento,
+   así que los estilos van acotados a .pagina para no pisar los de inicio. */
+
+.pagina {
+    min-height: 100vh;
+    background-color: beige;
+}
+
+.pagina p {
+    color: #000;
+}
+
+.pagina .contenido {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}

@@ -1,0 +1,13 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: white;
+    color: rgb(9, 9, 9);
+    font-family: Arial, sans-serif;
+    background-size: cover;
+    background-position: center;
+}
