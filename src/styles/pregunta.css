@@ -1,17 +1,419 @@
-/* Pantalla "Modo Aprendizaje".
-   Antes eran páginas separadas; ahora comparten el mismo documento,
-   así que los estilos van acotados a .pagina para no pisar los de inicio. */
+
 
 .pagina {
+    --pg-fondo: #f2e9dc;
+    --pg-tarjeta: #fcf8f3;
+    --pg-borde: #dcc7ab;
+    --pg-opcion: #f2e7da;
+    --pg-oscuro: #3b1f0e;
+    --pg-medio: #6b3a1f;
+    --pg-dorado: #c98b57;
+    --pg-verde: #27ae60;
+    --pg-rojo: #c0392b;
+
     min-height: 100vh;
-    background-color: beige;
+    padding: 28px 40px 40px;
+    background-color: var(--pg-fondo);
+    color: var(--pg-oscuro);
+    font-family: "Montserrat", Arial, sans-serif;
 }
 
 .pagina p {
-    color: #000;
+    color: var(--pg-oscuro);
 }
 
+/*  Cabecera  */
+.pagina .cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.pagina h1 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--pg-oscuro);
+}
+
+.pagina .progreso {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--pg-medio);
+}
+
+.pagina .barra {
+    width: 110px;
+    height: 7px;
+    border-radius: 4px;
+    background: var(--pg-borde);
+    overflow: hidden;
+}
+
+.pagina .barra-relleno {
+    height: 100%;
+    background: var(--pg-oscuro);
+    transition: width 0.3s ease;
+}
+
+/* Tarjetas de preguntas  */
 .pagina .contenido {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* si la cantidad es impar, la última ocupa todo el ancho */
+.pagina .tarjeta-pregunta:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+.pagina .tarjeta-pregunta {
+    padding: 18px 16px;
+    border: 1px solid var(--pg-borde);
+    border-radius: 12px;
+    background: var(--pg-tarjeta);
+}
+
+.pagina .pregunta-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.pagina .numero {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--pg-oscuro);
+    color: var(--pg-fondo);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.pagina .enunciado {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/*  Opciones  */
+.pagina .opciones {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+.pagina .tarjeta-pregunta:last-child:nth-child(odd) .opciones {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 6px;
+}
+
+.pagina .opcion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    border: 1px solid var(--pg-borde);
+    border-radius: 6px;
+    background: var(--pg-opcion);
+    color: var(--pg-medio);
+    font-family: inherit;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pagina .opcion:hover {
+    background: #eadcc9;
+}
+
+.pagina .letra {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--pg-borde);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--pg-oscuro);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* opción elegida: se pone marrón (no dice si está bien o mal) */
+.pagina .opcion.seleccionada {
+    border-color: var(--pg-oscuro);
+    background: var(--pg-oscuro);
+    color: var(--pg-fondo);
+}
+
+.pagina .opcion.seleccionada .letra {
+    border-color: var(--pg-dorado);
+    background: var(--pg-dorado);
+    color: #fff;
+}
+
+/*  Botones de abajo  */
+.pagina .acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.pagina .pg-boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 36px;
+    border: 1px solid var(--pg-oscuro);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.pagina .pg-volver {
+    background: transparent;
+    color: var(--pg-oscuro);
+}
+
+.pagina .pg-volver:hover {
+    background: rgba(59, 31, 14, 0.08);
+}
+
+.pagina .pg-enviar {
+    background: var(--pg-oscuro);
+    color: var(--pg-fondo);
+}
+
+.pagina .pg-enviar:hover:not(:disabled) {
+    background: var(--pg-medio);
+}
+
+.pagina .pg-enviar:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* RESULTADOS*/
+.pagina .resumen {
+    display: flex;
+    gap: 10px;
+}
+
+.pagina .dato {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 104px;
+    padding: 8px 20px;
+    border: 1px solid;
+    border-radius: 8px;
+}
+
+.pagina .dato strong {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 26px;
+    line-height: 1.1;
+}
+
+.pagina .dato span {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.pagina .dato-bien {
+    background: #eef7f1;
+    border-color: #bfe3cb;
+    color: var(--pg-verde);
+}
+
+.pagina .dato-mal {
+    background: #fdecea;
+    border-color: #f2c0bb;
+    color: var(--pg-rojo);
+}
+
+.pagina .dato-puntaje {
+    background: var(--pg-oscuro);
+    border-color: var(--pg-oscuro);
+    color: #d9a066;
+}
+
+/* ----- Bloque de cada pregunta ----- */
+.pagina .resultado {
+    margin-bottom: 14px;
+    border: 1px solid;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.pagina .resultado.acierto {
+    border-color: #bfe3cb;
+    background: #f7fcf9;
+}
+
+.pagina .resultado.fallo {
+    border-color: #f2c0bb;
+    background: #fff8f7;
+}
+
+.pagina .resultado-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 24px;
+    border-bottom: 1px solid;
+}
+
+.pagina .acierto .resultado-cabecera {
+    background: #eef7f1;
+    border-color: #d3eadb;
+}
+
+.pagina .fallo .resultado-cabecera {
+    background: #fdecea;
+    border-color: #f6d3cf;
+}
+
+.pagina .resultado-icono {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.pagina .acierto .resultado-icono {
+    background: var(--pg-verde);
+}
+
+.pagina .fallo .resultado-icono {
+    background: var(--pg-rojo);
+}
+
+.pagina .resultado-estado {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.pagina .acierto .resultado-estado {
+    color: var(--pg-verde);
+}
+
+.pagina .fallo .resultado-estado {
+    color: var(--pg-rojo);
+}
+
+.pagina .resultado-pregunta {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--pg-oscuro);
+}
+
+.pagina .resultado-cuerpo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 24px 16px 76px;
+}
+
+.pagina .caja {
+    flex: 1 1 0;
+    min-width: 220px;
+    padding: 10px 16px;
+    border: 1px solid;
+    border-radius: 6px;
+}
+
+.pagina .acierto .caja {
+    flex: 0 1 540px;
+}
+
+.pagina .caja-bien {
+    background: #f1faf4;
+    border-color: #b7dcc4;
+}
+
+.pagina .caja-mal {
+    background: #fdecea;
+    border-color: #f2c0bb;
+}
+
+.pagina .caja-etiqueta {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.pagina .caja-bien .caja-etiqueta {
+    color: var(--pg-verde);
+}
+
+.pagina .caja-mal .caja-etiqueta {
+    color: var(--pg-rojo);
+}
+
+.pagina .caja-texto {
+    display: block;
+    font-size: 13px;
+    color: var(--pg-oscuro);
+}
+
+@media (max-width: 800px) {
+    .pagina {
+        padding: 20px 16px 32px;
+    }
+
+    .pagina .cabecera {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pagina .contenido {
+        grid-template-columns: 1fr;
+    }
+
+    .pagina .tarjeta-pregunta:last-child:nth-child(odd) .opciones {
+        grid-template-columns: 1fr;
+    }
+
+    .pagina .resultado-cuerpo {
+        padding: 16px;
+    }
+
+    .pagina .acciones {
+        flex-direction: column-reverse;
+    }
 }
