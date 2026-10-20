@@ -64,17 +64,19 @@
 
 /* ===== PANTALLA DE INICIO ===== */
 .pantalla-inicio {
-    display: flex;              /* React la monta cuando termina la carga */
+    display: flex;              
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--beige) 0%, #f5e6d3 100%);
+    background-image: url(../assets/img/ffondo.jpg);
     background-color: #000;
     color: var(--cafe-oscuro);
     font-family: "Montserrat", Arial, sans-serif;
+    background-size: 100% 100%;
 }
+
 
 .pantalla-inicio .portada {
     display: flex;
@@ -92,7 +94,7 @@
     letter-spacing: 0.32em;
     text-indent: 0.32em;
     text-transform: uppercase;
-    color: var(--cafe-medio);
+    color: var(--crema);
 }
 
 
@@ -147,7 +149,7 @@
     background:
         linear-gradient(var(--crema), var(--crema)) padding-box,
         conic-gradient(from var(--h),
-            transparent 0%, transparent 55%, var(--cafe-medio) 80%, var(--cafe-oscuro) 100%) border-box;
+            transparent 0%, transparent 55%, var(--cafe-suave) 80%, var(--dorado) 100%) border-box;
 }
 
 .boton-principal:hover {

@@ -13,16 +13,21 @@ function Pregunta() {
   // false = está respondiendo | true = ya envió y ve los resultados
   const [enviado, setEnviado] = useState(false)
 
+
   useEffect(() => {
+    // fetch sirve para hacer peticiones a un servidor
+
     fetch('/api/preguntas')
       .then((res) => {
         if (!res.ok) throw new Error('Falló el servidor')
         return res.json()
       })
+
       .then((datos) => setPreguntas(datos))
       .catch(() => setError(true))
       .finally(() => setCargando(false))
   }, [])
+
 
   function elegir(idPregunta, letra) {
     setRespuestas({ ...respuestas, [idPregunta]: letra })
@@ -38,12 +43,16 @@ function Pregunta() {
   const respondidas = Object.keys(respuestas).length
   const todasRespondidas = total > 0 && respondidas === total
 
-  const aciertos = preguntas.filter((p) => {
+
+    const aciertos = preguntas.filter((p) => {
     const elegida = p.opciones.find((o) => o.letra === respuestas[p.id])
     return elegida?.correcta
   }).length
+  
+
   const fallos = total - aciertos
   const porcentaje = total > 0 ? Math.round((aciertos / total) * 100) : 0
+
 
   //  VISTA 2: RESULTADOS (después de dar "Enviar respuestas")
   if (enviado) {
@@ -112,11 +121,11 @@ function Pregunta() {
           )
         })}
 
-        <footer className="acciones">
-          <Link to="/" className="pg-boton pg-volver">
-            Volver al inicio
-          </Link>
-        </footer>
+      <footer className="acciones">
+  <Link to="/" state={{ saltarCarga: true }} className="pg-boton pg-volver">
+    Volver al inicio
+  </Link>
+</footer>
       </main>
     )
   }
@@ -173,7 +182,7 @@ function Pregunta() {
 
       {total > 0 && (
         <footer className="acciones">
-          <Link to="/" className="pg-boton pg-volver">
+          <Link to="/" state={{ saltarCarga: true }} className="pg-boton pg-volver">
             Volver
           </Link>
           <button

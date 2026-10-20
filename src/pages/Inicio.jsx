@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Chispas from '../components/Chispas.jsx'
 import PantallaCarga from '../components/PantallaCarga.jsx'
 import PantallaInicio from '../components/PantallaInicio.jsx'
@@ -9,9 +9,10 @@ import '../styles/inicio.css'
 
 function Inicio() {
   const navigate = useNavigate()
+   const location = useLocation()  
   const botonVideoRef = useRef(null)
 
-  const [cargando, setCargando] = useState(true)
+  const [cargando, setCargando] = useState(!location.state?.saltarCarga)
   const [infoAbierta, setInfoAbierta] = useState(false)
   const [videoAbierto, setVideoAbierto] = useState(false)
 
@@ -24,7 +25,7 @@ function Inicio() {
 
   return (
     <main className="contenedor-principal">
-      <Chispas />
+{cargando && <Chispas />}
 
       {cargando ? (
         <PantallaCarga onTerminar={terminarCarga} />
