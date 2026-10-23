@@ -5,11 +5,10 @@ import PantallaCarga from '../components/PantallaCarga.jsx'
 import PantallaInicio from '../components/PantallaInicio.jsx'
 import PanelInformacion from '../components/PanelInformacion.jsx'
 import ModalVideo from '../components/ModalVideo.jsx'
-import '../styles/inicio.css'
 
 function Inicio() {
   const navigate = useNavigate()
-   const location = useLocation()  
+  const location = useLocation()
   const botonVideoRef = useRef(null)
 
   const [cargando, setCargando] = useState(!location.state?.saltarCarga)
@@ -24,8 +23,8 @@ function Inicio() {
   }, [])
 
   return (
-    <main className="contenedor-principal">
-{cargando && <Chispas />}
+    <main className="flex min-h-screen flex-col items-center justify-center gap-7.5">
+      {cargando && <Chispas />}
 
       {cargando ? (
         <PantallaCarga onTerminar={terminarCarga} />
