@@ -70,20 +70,23 @@ function PantallaCarga({ onTerminar }) {
   }, [])
 
   return (
-    <div className="pantalla-carga">
-      <audio className="sonido-ba" src={sonidoCafe} ref={audioRef} />
+    <div className="flex flex-col items-center gap-7.5">
+      <audio src={sonidoCafe} ref={audioRef} />
 
       <LogoRoast ref={logoRef} />
 
-      <div className="barra-carga">
-        <div className="barra-progreso" style={{ width: `${porcentaje}%` }} />
+      <div className="h-[25px] w-[500px] rounded-[15px] border-2 border-tostado">
+        <div
+          className="h-full rounded-[10px] bg-[url(../assets/img/Grano-Oscuro-removebg-preview.png)] bg-size-[auto_100%] bg-repeat-x transition-[width] duration-100 ease-linear"
+          style={{ width: `${porcentaje}%` }}
+        />
       </div>
 
-      <div className="simulador-tueste">
-        <p>Simulador de tueste de café</p>
+      <div>
+        <p className="text-white">Simulador de tueste de café</p>
       </div>
 
-      <p>
+      <p className="text-white">
         Cargando <span>{Math.round(porcentaje)}%</span>
       </p>
     </div>

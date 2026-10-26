@@ -61,10 +61,7 @@ function Chispas() {
   if (!visible) return null
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{ position: 'fixed', inset: 0, zIndex: -1 }}
-    />
+    <canvas ref={canvasRef} className="fixed inset-0 -z-1" />
   )
 }
 

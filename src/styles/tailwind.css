@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Único archivo de estilos del proyecto: en Tailwind v4 aquí vive la
+   configuración (colores, fuentes y animaciones). Todo lo demás se escribe
+   con clases directamente en los componentes. */
+
 @theme {
   --color-cafe-oscuro: #3b1f0e;
   --color-cafe-medio: #6b3a1f;
@@ -11,4 +15,58 @@
 
   --font-titulo: "Playfair Display", Georgia, serif;
   --font-cuerpo: "Montserrat", Arial, sans-serif;
+  --font-arial: Arial, sans-serif;
+
+  /* Animaciones -> se usan como animate-girar-borde, animate-video-sube, etc. */
+  --animate-girar-borde: girar-borde 3s linear infinite;
+  --animate-video-aparece: video-aparece 0.3s ease;
+  --animate-video-sube: video-sube 0.45s ease both;
+  --animate-sombra-pulse: sombra-pulse 2.5s ease-in-out infinite;
+  --animate-sombra-pulse-alterna: sombra-pulse 2.5s ease-in-out infinite alternate;
+
+  @keyframes girar-borde {
+    to {
+      --h: 360deg;
+    }
+  }
+
+  @keyframes video-aparece {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes video-sube {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes sombra-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 1px rgba(139, 94, 60, 0.25);
+    }
+    50% {
+      box-shadow:
+        0 0 0 1px rgba(139, 94, 60, 0.6),
+        0 0 12px rgba(0, 0, 0, 0.85);
+    }
+  }
+}
+
+/* Variable animable para el borde giratorio de los botones de modo.
+   (@property no se puede escribir con clases, por eso queda aquí.) */
+@property --h {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
