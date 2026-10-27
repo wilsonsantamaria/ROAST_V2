@@ -9,7 +9,7 @@ const DESCRIPCIONES = {
   desafio: {
     titulo: 'Modo desafío',
     texto:
-      'Ponte a prueba en una partida más exigente. Pronto podrás medir tu nivel y competir por el mejor puntaje.',
+      'Ponte a prueba en una partida más exigente. Pronto podrás medir tu nivel y competir por el mejor puntaje',
   },
 }
 
