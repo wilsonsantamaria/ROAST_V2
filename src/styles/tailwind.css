@@ -17,7 +17,7 @@
   --font-cuerpo: "Montserrat", Arial, sans-serif;
   --font-arial: Arial, sans-serif;
 
-  /* Animaciones -> se usan como animate-girar-borde, animate-video-sube, etc. */
+  /* Animaciones -> se usan como animate-girar-borde, animate-video-sube, ettc. */
   --animate-girar-borde: girar-borde 3s linear infinite;
   --animate-video-aparece: video-aparece 0.3s ease;
   --animate-video-sube: video-sube 0.45s ease both;
