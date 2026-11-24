@@ -29,7 +29,7 @@
 
     function PantallaInicio({ onPregunta,onDesafio, onVideo, botonVideoRef }) {
     return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-black bg-[url(../assets/img/SS.jpg)] bg-size-[100%_100%] font-cuerpo text-cafe-oscuro">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-black bg-[url(../assets/img/ca.jpg)] bg-size-[100%_100%] font-cuerpo text-cafe-oscuro">
     <div className="flex flex-col items-center justify-center px-5 pt-[25px] pb-[18px] text-center">
     <div>
     <LogoRoast />

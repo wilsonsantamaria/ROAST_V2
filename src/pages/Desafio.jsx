@@ -1,239 +1,304 @@
-       
-       import { useEffect, useState } from 'react'
-        import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
-        // ===== Fotos de los cafeteros (cámbialas por las tuyas cuando las tengas) =====
-        // Guarda tus imágenes en src/assets/img/ y cambia solo la ruta del import.
-        import fotoJuanito from '../assets/img/juan.png'
-        import fotoCamila from '../assets/img/camila.png'
-        import fotoMateo from '../assets/img/mateo.png'
+// Importaciones de las fotos de los cafeteros
+import fotoJuanito from '../assets/img/juan.png'
+import fotoCamila from '../assets/img/camila.png'
+import fotoMateo from '../assets/img/mateo.png'
 
-        // Un cafetero por cada dificultad
-        const PERFILES = {
-        facil: { nombre: 'Juanito', rango: 'Aprendiz de tostión', foto: fotoJuanito },
-        medio: { nombre: 'Camila', rango: 'Tostadora experta', foto: fotoCamila },
-        dificil: { nombre: 'Mateo', rango: 'Maestro tostador', foto: fotoMateo },
-        }
+// Configuración visual por dificultad (asociada a los cafeteros)
+const NIVELES = {
+facil: { 
+nombre: 'Juanito', 
+rango: 'Aprendiz de tostión', 
+foto: fotoJuanito,
+texto: 'FÁCIL', 
+},
+medio: { 
+nombre: 'Camila', 
+rango: 'Tostadora experta', 
+foto: fotoCamila,
+texto: 'MEDIO', 
+},
+dificil: { 
+nombre: 'Mateo', 
+rango: 'Maestro tostador', 
+foto: fotoMateo,
+texto: 'DIFÍCIL', 
+},
+}
 
-        // Textos y colores de cada nivel
-        const NIVELES = {
-        facil: { texto: 'Fácil', badge: 'bg-[#4a9a2a]', borde: 'border-[#4a9a2a]' },
-        medio: { texto: 'Medio', badge: 'bg-[#d68910]', borde: 'border-[#d68910]' },
-        dificil: { texto: 'Difícil', badge: 'bg-[#c0392b]', borde: 'border-[#c0392b]' },
-        }
+// Convierte segundos a formato mm:ss
+function formatoTiempo(seg) {
+const s = Number(seg) || 0
+const m = Math.floor(s / 60)
+const r = String(s % 60).padStart(2, '0')
+return `${m}:${r}`
+}
 
-        const TUESTES = {
-        claro: { titulo: 'Tueste claro', ingles: 'Light roast' },
-        medio: { titulo: 'Tueste medio', ingles: 'Medium roast' },
-        oscuro: { titulo: 'Tueste oscuro', ingles: 'Dark roast' },
-        }
+// Genera una pista basada en los datos reales del desafío de la base de datos
+function crearPista(d) {
+const crack = Number(d.temp_primer_crack_c)
+if (!crack) return 'Vigila la temperatura y retira el grano en el momento justo.'
+if (d.dificultad === 'facil')
+return `Mantén la temperatura por debajo de ${crack}°C. Retira el grano justo antes del primer crack.`
+if (d.dificultad === 'medio')
+return `Pasa el primer crack (${crack}°C) y detén el tueste antes de ${crack + 14}°C.`
+return `Supera los ${crack + 14}°C y desarrolla el grano hasta el segundo crack con calma.`
+}
 
-        // Convierte segundos a mm:ss
-        function formatoTiempo(seg) {
-        const s = Number(seg) || 0
-        const m = Math.floor(s / 60)
-        const r = String(s % 60).padStart(2, '0')
-        return `${m}:${r}`
-        }
+export default function Desafio() {
+const [dificultad, setDificultad] = useState('facil')
+const [desafio, setDesafio] = useState(null)
+const [cargando, setCargando] = useState(true)
+const [error, setError] = useState(null)
 
-        // La pista se arma con los datos reales del café y del desafío
-        function crearPista(d) {
-        const crack = Number(d.temp_primer_crack_c)
-        if (!crack) return 'Vigila la temperatura y retira el grano en el momento justo.'
-        if (d.tipo_tueste === 'claro')
-        return `Mantén la temperatura por debajo de ${crack}°C. Retira el grano justo antes del primer crack.`
-        if (d.tipo_tueste === 'medio')
-        return `Pasa el primer crack (${crack}°C) y detén el tueste antes de ${crack + 14}°C.`
-        return `Supera los ${crack + 14}°C y desarrolla el grano hasta el segundo crack con calma.`
-        }
+const navigate = useNavigate() // Hook para navegar entre pantallas
+const perfilActual = NIVELES[dificultad]
 
-        function Dato({ icono, etiqueta, valor }) {
-        return (
-        <div className="flex items-center gap-3 rounded-xl border border-[#e0c9ae] bg-[#fdf9f4] px-4 py-3">
-        <span className="text-[22px]">{icono}</span>
-        <div>
-        <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#936e58]">
-        {etiqueta}
-        </span>
-        <strong className="font-titulo text-[17px] text-[#3b1f0e]">{valor}</strong>
-        </div>
-        </div>
-        )
-        }
+// Función para conectar con tu backend y traer un desafío aleatorio de la BD
+async function cargarDesafio(nivel) {
+setCargando(true)
+setError(null)
+try {
+const res = await fetch(`http://localhost:3000/api/desafios?dificultad=${nivel}`)
+if (!res.ok) throw new Error('No se encontraron desafíos para esta dificultad en la base de datos')
+const data = await res.json()
+setDesafio(data)
+} catch (err) {
+console.error(err)
+setError(err.message)
+setDesafio(null)
+} finally {
+setCargando(false)
+}
+}
 
-        function Desafio() {
-        const [dificultad, setDificultad] = useState('facil')
-        const [desafio, setDesafio] = useState(null)
-        const [cargando, setCargando] = useState(true)
-        const [error, setError] = useState(null)
-        const [menuAbierto, setMenuAbierto] = useState(false)
+// Cada vez que cambie la dificultad, se consulta la base de datos
+useEffect(() => {
+cargarDesafio(dificultad)
+}, [dificultad])
 
-        async function cargarDesafio(nivel) {
-        setCargando(true)
-        setError(null)
-        try {
-        const res = await fetch(`/api/desafios?dificultad=${nivel}`)
-        if (!res.ok) throw new Error('No se encontraron desafíos para esta dificultad')
-        setDesafio(await res.json())
-        } catch (err) {
-        setError(err.message)
-        setDesafio(null)
-        } finally {
-        setCargando(false)
-        }
-        }
+// Función para enviar los datos al simulador de la máquina
+function iniciarTueste() {
+if (!desafio) return
 
-        useEffect(() => {
-        cargarDesafio(dificultad)
-        }, [dificultad])
+navigate('/simulador', { 
+state: { 
+desafioActual: desafio, 
+nivelDificultad: dificultad,
+operador: perfilActual 
+} 
+})
+}
 
-        function elegirNivel(nivel) {
-        setDificultad(nivel)
-        setMenuAbierto(false)
-        }
+return (
+<main className="min-h-screen bg-[#12100e] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#1e1612] via-[#12100e] to-[#0b0a09] px-4 pb-12 pt-5 font-sans text-[#f5f2eb] md:px-10 md:pt-7">
+<div className="mx-auto max-w-[1200px]">
 
-        function iniciarDesafio() {
-        // Aquí se conecta el simulador de tueste (pantalla del tostador).
-        console.log('Iniciar desafío', desafio)
-        }
+{/* ===== Cabecera Superior ===== */}
+<header className="mb-10 flex items-center justify-between border-b border-[#2a231d] pb-4 text-xs tracking-widest text-[#a89f91]">
+<Link
+to="/"
+state={{ saltarCarga: true }}
+className="flex items-center gap-2 font-bold uppercase no-underline hover:text-white transition-colors"
+>
+<svg className="size-6 text-[#d97706]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<circle cx="12" cy="12" r="9" />
+<path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" strokeWidth="1.5" strokeOpacity="0.4" />
+<path d="M12 8l-2 4h4l-2 4" fill="currentColor" />
+</svg>
+<span>VOLVER</span>
+</Link>
 
-        const perfil = PERFILES[dificultad]
-        const nivel = NIVELES[dificultad]
-        const tueste = desafio ? TUESTES[desafio.tipo_tueste] : null
+<div className="flex items-center gap-4">
+<div className="h-[1px] w-12 bg-[#2a231d]" />
+<span className="font-bold tracking-[0.25em] text-[#d97706]">ROAST</span>
+<div className="h-[1px] w-12 bg-[#2a231d]" />
+</div>
 
-        return (
-        <main className="min-h-screen bg-[#f2e9dc] px-4 pb-12 pt-5 font-cuerpo text-[#3b1f0e] md:px-10 md:pt-7">
-        <div className="mx-auto max-w-[1008px]">
-        {/* ===== Cabecera: volver + título ===== */}
-        <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-titulo text-[34px] font-bold">Modo desafío</h1>
-        <Link
-        to="/"
-        state={{ saltarCarga: true }}
-        className="inline-flex items-center gap-2 rounded-sm border border-[#3b1f0e] px-6 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#3b1f0e] no-underline hover:bg-[#3b1f0e]/10"
-        >
-        ← Volver al inicio
-        </Link>
-        </header>
+<span className="text-[#a89f91]">MODO DESAFIO </span>
+</header>
 
-        {/* ===== Perfil del cafetero (cambia según la dificultad) ===== */}
-        <section className="flex items-center gap-5 border-b border-[#e0c9ae] pb-6">
-        <div
-        className={`grid size-[84px] shrink-0 place-items-center overflow-hidden rounded-full border-[3px] bg-[#f8f4ee] ${nivel.borde}`}
-        >
-        <img src={perfil.foto} alt={perfil.nombre} className="size-full object-contain p-2" />
-        </div>
-        <div>
-        <h2 className="font-titulo text-[28px] font-bold leading-tight">{perfil.nombre}</h2>
-        <p className="text-[14px] text-[#6b3a1f]">{perfil.rango}</p>
-        </div>
-        </section>
+{/* ===== Contenedor Principal en 2 Columnas ===== */}
+<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
 
-        {cargando && <p className="mt-8 text-[#6b3a1f]">Cargando desafío...</p>}
-        {error && !cargando && (
-        <p className="mt-8 rounded-lg border border-[#f2c0bb] bg-[#fdecea] px-4 py-3 text-[#c0392b]">
-        {error}
-        </p>
-        )}
+{/* ===== Columna Izquierda: Operador y Misión Activa ===== */}
+<div className="flex flex-col justify-between lg:col-span-5 space-y-6">
 
-        {desafio && !cargando && (
-        <div className="animate-video-sube">
-        {/* ===== Tarjeta oscura del encargo ===== */}
-        <section className="relative mt-8 overflow-hidden rounded-2xl bg-[#3b1f0e] px-6 py-5 text-[#f2e9dc] shadow-lg">
-        <div className="absolute -bottom-10 -right-10 size-[150px] rounded-full bg-white/5" />
+{/* Operador Asignado */}
+<div className="border-b border-[#2a231d] pb-6 ">
+<span className="block text-[10px] uppercase tracking-[0.2em] text-[#8c8275] mb-3">
+OPERADOR ASIGNADO
+</span>
+<div className="flex items-center gap-4">
+<div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d97706]/40 bg-[#1a1512]">
+<img 
+src={perfilActual.foto} 
+alt={perfilActual.nombre} 
+className="size-full object-cover p-1 rounded-full" 
+/>
+</div>
+<div>
+<h2 className="font-bold text-[18px] tracking-wide text-[#f5f2eb]">{perfilActual.nombre}</h2>
+<p className="text-[12px] text-[#d97706] font-medium">{perfilActual.rango}</p>
+</div>
+</div>
+</div>
 
-        <div className="relative flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-        <span className="text-[26px]">☕</span>
-        <div>
-        <h3 className="font-titulo text-[18px] font-bold">
-        {tueste?.titulo} · {desafio.nombre_grano}
-        </h3>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#d9a066]">
-        {tueste?.ingles} · Origen: {desafio.origen}
-        </span>
-        </div>
-        </div>
-        <span
-        className={`rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white ${nivel.badge}`}
-        >
-        {nivel.texto}
-        </span>
-        </div>
+{/* Misión Activa */}
+<div className="space-y-4">
+<span className="block text-[10px] uppercase tracking-[0.2em] text-[#d97706] font-semibold">
+MISIÓN ACTIVA
+</span>
+<h1 className="font-serif text-[32px] font-extrabold leading-tight tracking-tight text-[#f5f2eb]">
+DOMINA LA CURVA.<br />
+<span className="text-[#d97706]">DEFINE EL SABOR.</span>
+</h1>
+<p className="text-[13px] leading-relaxed text-[#a89f91]">
+Ajusta la potencia del quemador en tiempo real y mantén el perfil dentro del rango objetivo. Cada segundo modifica el resultado.
+</p>
+</div>
 
-        <p className="relative mt-4 border-l-[3px] border-[#d9a066] pl-3 text-[14px] leading-relaxed">
-        {desafio.descripcion_tarea}
-        </p>
-        </section>
+{/* Tarjetas de Tiempo y Objetivo */}
+<div className="grid grid-cols-2 gap-4 pt-2">
+<div className="rounded-xl border border-[#2a231d] bg-[#14100e]/80 p-4 shadow-inner">
+<span className="block text-[10px] uppercase tracking-[0.15em] text-[#8c8275] mb-1">
+⏱️ TIEMPO
+</span>
+<strong className="text-[20px] font-bold tracking-wider">
+{desafio ? formatoTiempo(desafio.tiempo_limite_seg) : '--:--'}
+</strong>
+</div>
+<div className="rounded-xl border border-[#2a231d] bg-[#14100e]/80 p-4 shadow-inner">
+<span className="block text-[10px] uppercase tracking-[0.15em] text-[#8c8275] mb-1">
+🎯 OBJETIVO (1er Crack)
+</span>
+<strong className="text-[18px] font-bold tracking-wider text-[#d97706]">
+{desafio ? `${desafio.temp_primer_crack_c} °C` : '-- °C'}
+</strong>
+</div>
+</div>
 
-        {/* ===== Datos del lote ===== */}
-        <section className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Dato icono="⚖️" etiqueta="Capacidad" valor={`${desafio.capacidad_kg} kg`} />
-        <Dato icono="⏱️" etiqueta="Tiempo límite" valor={formatoTiempo(desafio.tiempo_limite_seg)} />
-        <Dato icono="🔥" etiqueta="1er crack" valor={`${desafio.temp_primer_crack_c} °C`} />
-        <Dato icono="🫘" etiqueta="Café" valor={desafio.nombre_grano?.replace('Café ', '')} />
-        </section>
+</div>
 
-        {/* ===== Pista ===== */}
-        <section className="mt-4 flex items-center gap-3 rounded-lg border border-[#b7dcc4] bg-[#eef7f1] px-4 py-3 text-[13px] text-[#1e5b34]">
-        <span className="grid size-5 shrink-0 place-items-center rounded-full border border-[#27ae60] text-[11px] font-bold text-[#27ae60]">
-        !
-        </span>
-        <p>
-        <strong>Pista:</strong> {crearPista(desafio)}
-        </p>
-        </section>
-        </div>
-        )}
+{/* ===== Columna Derecha: Selección de Protocolo y Datos del Desafío ===== */}
+<div className="lg:col-span-7 rounded-2xl border border-[#2a231d] bg-[#15110e]/90 p-6 shadow-2xl flex flex-col justify-between backdrop-blur-sm">
 
-        {/* Iniciar */}
-        <section className="mt-8 flex flex-col items-center gap-3">
-        <button
-        onClick={iniciarDesafio}
-        disabled={!desafio || cargando}
-        className="w-full max-w-[270px] cursor-pointer rounded-md bg-[#3b1f0e] px-8 py-4 font-titulo text-[20px] font-bold text-[#f2e9dc] shadow-[0_8px_20px_rgba(59,31,14,0.35)] transition hover:-translate-y-0.5 hover:bg-[#6b3a1f] disabled:cursor-not-allowed disabled:opacity-40"
-        >
-        Iniciar desafío
-        </button>
+<div>
+{/* Cabecera del selector */}
+<div className="flex items-center justify-between border-b border-[#2a231d] pb-4 mb-6">
+<div>
+<span className="block text-[10px] uppercase tracking-[0.2em] text-[#8c8275]">
+SELECCIONA PROTOCOLO
+</span>
+<h3 className="text-[16px] font-bold tracking-wider text-[#f5f2eb]">
+NIVEL DE DIFICULTAD
+</h3>
+</div>
 
-        {/* Menú de dificultad */}
-        <div className="relative w-[224px]">
-        <button
-        onClick={() => setMenuAbierto(!menuAbierto)}
-        className="flex w-full cursor-pointer items-center justify-between rounded-md bg-[#3b1f0e] px-4 py-3 text-[14px] font-bold text-[#f2e9dc]"
-        >
-        {nivel.texto}
-        <span className={`text-[11px] transition ${menuAbierto ? 'rotate-180' : ''}`}>▼</span>
-        </button>
+<button
+onClick={() => cargarDesafio(dificultad)}
+disabled={cargando}
+className="inline-flex items-center gap-1.5 rounded-md border border-[#3a2f26] bg-[#1c1612] px-3 py-1.5 text-[11px] font-semibold text-[#a89f91] hover:border-[#d97706] hover:text-[#d97706] transition-all cursor-pointer disabled:opacity-50"
+title="Buscar otra tarea al azar"
+>
+<span className={cargando ? 'animate-spin inline-block' : ''}>↻</span>
+<span>Restablecer</span>
+</button>
+</div>
 
-        {menuAbierto && (
-        <ul className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-md border border-[#e0c9ae] bg-[#fdf9f4] shadow-lg">
-        {Object.entries(NIVELES)
-        .filter(([clave]) => clave !== dificultad)
-        .map(([clave, n]) => (
-        <li key={clave}>
-        <button
-        onClick={() => elegirNivel(clave)}
-        className="w-full cursor-pointer border-b border-[#e0c9ae] px-4 py-3 text-left text-[14px] text-[#3b1f0e] last:border-b-0 hover:bg-[#f2e9dc]"
-        >
-        {n.texto}
-        </button>
-        </li>
-        ))}
-        </ul>
-        )}
-        </div>
+{/* Botones de Dificultad */}
+<div className="grid grid-cols-3 gap-3 mb-8">
+{Object.entries(NIVELES).map(([clave, datos]) => {
+const activo = dificultad === clave
+return (
+<button
+key={clave}
+onClick={() => setDificultad(clave)}
+className={`relative cursor-pointer text-left rounded-lg p-6 transition-all border ${
+activo 
+? 'bg-[#221a14] border-[#d97706]' 
+: 'bg-[#120e0c] border-[#2a231d] hover:border-[#3d3128]'
+}`}
+>
+<div className="flex justify-between items-center mb-2">
+<span className={`text-[12px] font-bold ${activo ? 'text-[#d97706]' : 'text-[#f5f2eb]'}`}>
+{datos.texto}
+</span>
+<img 
+src={datos.foto} 
+alt={datos.nombre} 
+className="size-6 rounded-full object-cover border border-[#3a2f26]" 
+/>
+</div>
+<p className="text-[11px] text-[#8c8275] truncate">{datos.rango}</p>
+{activo && (
+<div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#d97706] rounded-b-lg" />
+)}
+</button>
+)
+})}
+</div>
 
-        <button
-        onClick={() => cargarDesafio(dificultad)}
-        className="cursor-pointer text-[12px] font-semibold uppercase tracking-[0.14em] text-[#936e58] underline-offset-4 hover:underline"
-        >
-        ↻ Otro desafío
-        </button>
-        </section>
-        </div>
-        </main>
-        )
-        }
+{/* Estados de Carga y Error */}
+{cargando && (
+<div className="py-12 text-center text-[#d97706] text-sm font-medium animate-pulse">
+Cargando desafío desde la base de datos...
+</div>
+)}
 
-        export default Desafio
+{error && !cargando && (
+<div className="rounded-lg border border-red-900 bg-red-950/50 px-4 py-3 text-red-400 text-xs mb-6">
+{error}
+</div>
+)}
+
+{/* Detalles del Desafío */}
+{desafio && !cargando && (
+<div className="space-y-4 mb-8">
+<div className="flex items-start gap-3 border-l-2 border-[#d97706] pl-4">
+<div>
+<h4 className="text-[16px] font-bold tracking-wide text-[#f5f2eb]">
+{desafio.nombre_grano}
+</h4>
+<span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#d97706]">
+ORIGEN: {desafio.origen}
+</span>
+</div>
+</div>
+
+<p className="text-[13px] leading-relaxed text-[#c4bcae] pt-2">
+{desafio.descripcion_tarea}
+</p>
+
+<div className="rounded-lg border border-[#3a2f26] bg-[#1c1612]/60 px-3 py-2 text-[12px] text-[#d97706]">
+💡 <strong>Pista:</strong> {crearPista(desafio)}
+</div>
+</div>
+)}
+</div>
+
+{/* Acciones Inferiores */}
+<div className="pt-4 border-t border-[#2a231d] flex items-center justify-between">
+<span className="text-[11px] text-[#8c8275]">
+Operador activo: <strong className="text-[#f5f2eb]">{perfilActual.nombre}</strong>
+</span>
+
+<button
+onClick={iniciarTueste}
+disabled={!desafio || cargando}
+className="cursor-pointer rounded-lg bg-[#d97706] px-8 py-3.5 text-[14px] font-bold text-[#0e0c0a] shadow-lg transition hover:bg-[#b45309] hover:text-white disabled:opacity-50"
+>
+INICIAR TUESTE →
+</button>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</main>
+)
+}
